@@ -6,12 +6,13 @@ early_access: false
 enable_free_tier: true
 
 reviews:
-  profile: "chill"  # Options: chill, assertive
-  request_changes_workflow: false
+  profile: "assertive"  # Thorough review for Phase 4
+  request_changes_workflow: true
   high_level_summary: true
   poem: true
   review_status: true
   collapse_walkthrough: false
+  auto_title_placeholder: true
 
   # Auto-review on PR creation
   auto_review:
@@ -23,6 +24,67 @@ reviews:
 
   # Path-based review rules
   path_instructions:
+    - path: "features/photoanalysis/services/firestore_client.py"
+      instructions: |
+        **CRITICAL REVIEW - Step 17 Firestore Persistence**
+        Line-by-line analysis required:
+        - Firestore transaction atomicity and race conditions
+        - Error handling for network failures and timeouts
+        - Data conversion correctness (Pydantic ↔ Firestore)
+        - Hash collision handling strategy
+        - Query optimization and indexing needs
+        - Security: Firestore rules compatibility
+        - Pagination implementation correctness
+        - Memory leaks in long-running operations
+
+    - path: "features/photoanalysis/services/recommendation_engine.py"
+      instructions: |
+        **CRITICAL REVIEW - Step 18 AI Recommendations**
+        Line-by-line analysis required:
+        - WHOOP recovery zone logic accuracy (67%, 34% thresholds)
+        - Macro calculation formulas (BMR, TDEE correctness)
+        - Body type classification → workout split mapping
+        - Integration with nutrition-agent error handling
+        - Timeline estimation algorithm validity
+        - Personalization logic edge cases
+        - Missing null checks for optional fields
+
+    - path: "features/photoanalysis/services/error_handler.py"
+      instructions: |
+        **CRITICAL REVIEW - Step 19 Error Handling**
+        Line-by-line analysis required:
+        - Retry logic correctness (exponential backoff calculation)
+        - Async/sync decorator implementation safety
+        - Sentry integration error scenarios
+        - Memory leaks in error tracking
+        - Exception hierarchy design (recoverable vs fatal)
+        - Timeout implementation race conditions
+        - Context manager __aexit__ correctness
+        - Global state management in singleton
+
+    - path: "features/photoanalysis/services/performance_optimizer.py"
+      instructions: |
+        **CRITICAL REVIEW - Step 20 Performance Optimization**
+        Line-by-line analysis required:
+        - Cache TTL expiration logic correctness
+        - Redis connection handling and pool exhaustion
+        - Parallel execution semaphore limits
+        - Cache key collision probability
+        - Memory cache size limits and eviction
+        - Profiling overhead on production performance
+        - Batch processing edge cases (empty batches, errors)
+        - Async context manager safety
+
+    - path: "features/photoanalysis/test_phase_4.py"
+      instructions: |
+        **TEST QUALITY REVIEW**
+        - Missing test cases identification
+        - Edge case coverage (empty data, null values, failures)
+        - Mock usage appropriateness
+        - Async test implementation correctness
+        - Assertions completeness
+        - Test isolation and cleanup
+
     - path: "features/photoanalysis/**"
       instructions: |
         Focus on:
@@ -30,7 +92,7 @@ reviews:
         - Error handling comprehensiveness
         - Performance optimization opportunities
         - Pydantic model validation
-        - OpenAI API best practices
+        - API best practices
         - Image processing efficiency
 
     - path: "features/whoop-integration/**"
@@ -60,7 +122,7 @@ reviews:
 
   # Knowledge base for domain-specific review
   knowledge_base:
-    - "This is an AI-powered fitness platform using GPT-4o Vision for body composition analysis"
+    - "This is an AI-powered fitness platform using Claude 3.5 Sonnet for body composition analysis"
     - "Target: 95%+ success rate for body scans (up from 37% baseline)"
     - "Processing time goal: <30 seconds per scan"
     - "Uses MediaPipe for pose detection and angle classification"
@@ -68,6 +130,13 @@ reviews:
     - "Mathematical analysis includes Golden Ratio, Adonis Index, symmetry scoring"
     - "All measurements should be in metric units (cm, kg, %)"
     - "Security: Never log or store raw user images in plain text"
+    - "Phase 4 NEW: Firestore persistence, AI recommendations, error handling, performance optimization"
+    - "WHOOP recovery zones: Green ≥67%, Yellow 34-66%, Red <34%"
+    - "Adonis Index target: 1.618 (golden ratio for shoulder:waist)"
+    - "Body types: V-Taper, Classic, Rectangular, Apple, Pear, Balanced"
+    - "Macro formulas: Muscle gain 38cal/kg, Fat loss 28cal/kg, Maintenance 33cal/kg"
+    - "Retry pattern: 3 attempts with exponential backoff (1s → 2s → 4s)"
+    - "Cache TTL: Default 1 hour, user context 24 hours"
 
 chat:
   auto_reply: true
