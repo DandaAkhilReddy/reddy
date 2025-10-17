@@ -1,0 +1,128 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Firebase
+firebase-credentials.json
+*-firebase-adminsdk-*.json
+
+# API Keys
+*.key
+*.pem
+secrets/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Project specific
+*.pyc
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Image uploads (don't commit user data)
+uploads/
+user_images/
+scan_photos/
+
+# Model weights and large files
+*.h5
+*.pkl
+*.pth
+*.onnx
+models/weights/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Node.js (if frontend added)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
+*.egg-info/
+dist/
+build/
+
+# Cache
+.cache/
+*.cache
+
+# Misc
+*.bak
+*.orig
+*.rej
