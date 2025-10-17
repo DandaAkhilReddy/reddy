@@ -25,13 +25,13 @@ class Settings(BaseSettings):
     # WHOOP API Configuration
     whoop_client_id: Optional[str] = None
     whoop_client_secret: Optional[str] = None
-    whoop_redirect_uri: str = "http://localhost:8000/auth/whoop/callback"
+    whoop_redirect_uri: str = "http://localhost:7000/auth/whoop/callback"
     whoop_api_base_url: str = "https://api.prod.whoop.com/developer"
 
     # Application Configuration
     app_env: str = "development"
     app_host: str = "0.0.0.0"
-    app_port: int = 8000
+    app_port: int = 7000
     debug: bool = True
 
     # Sentry Monitoring
