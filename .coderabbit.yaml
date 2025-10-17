@@ -12,7 +12,6 @@ reviews:
   poem: true
   review_status: true
   collapse_walkthrough: false
-  auto_title_placeholder: true
 
   # Auto-review on PR creation
   auto_review:
@@ -196,13 +195,7 @@ tools:
     min_coverage: 80
 
 # Tone and style
-tone_instructions: |
-  Be constructive and educational. Focus on:
-  - Explaining WHY changes are suggested, not just WHAT
-  - Providing code examples for complex suggestions
-  - Highlighting positive patterns when found
-  - Prioritizing high-impact issues over nitpicks
-  - Being encouraging for first-time contributors
+tone_instructions: "Be constructive & educational: explain WHY not WHAT, provide examples, highlight positive patterns, prioritize high-impact issues, encourage contributors."
 
 # Custom rules for this project
 custom_rules:
