@@ -18,8 +18,9 @@ from ...models.schemas import (
 )
 from ...services.scan_assembler import assemble_scan_result
 from ...services.firestore_client import get_firestore_client
-from ...services.error_handler import get_error_handler, safe_execute
+from ...services.error_handler import get_error_handler, safe_execute, PhotoAnalysisError
 from ...services.performance_optimizer import get_performance_optimizer, ImageOptimizer
+from ...services.vision_pipeline import run_vision_analysis
 from ...utils.image_validator import validate_image
 
 logger = logging.getLogger(__name__)
@@ -94,44 +95,83 @@ async def create_scan(
         # Profile the operation
         async with optimizer.profile("create_scan"):
 
-            # Step 1: Validate images
-            async with optimizer.profile("validate_images"):
-                images_data = {}
-                image_quality = {}
+            # Read image data
+            front_bytes = await front_image.read()
+            side_bytes = await side_image.read()
+            back_bytes = await back_image.read()
 
-                for angle, upload_file in [
-                    ("front", front_image),
-                    ("side", side_image),
-                    ("back", back_image)
-                ]:
-                    # Read image data
-                    image_bytes = await upload_file.read()
-                    images_data[angle] = image_bytes
+            # Steps 1-9: Run complete AI vision pipeline
+            async with optimizer.profile("vision_pipeline_steps_1_9"):
+                try:
+                    measurements, confidence, pipeline_metadata = await run_vision_analysis(
+                        front_image=front_bytes,
+                        side_image=side_bytes,
+                        back_image=back_bytes,
+                        user_id=user_id,
+                        height_cm=height_cm,
+                        gender=gender,
+                        filename_front=front_image.filename,
+                        filename_side=side_image.filename,
+                        filename_back=back_image.filename
+                    )
 
-                    # Validate
-                    quality = validate_image(image_bytes, upload_file.filename)
+                    logger.info(
+                        f"Vision pipeline complete | Confidence: {confidence.overall_confidence:.2f} | "
+                        f"Steps: {len(pipeline_metadata.get('steps_completed', []))}/9"
+                    )
 
-                    if not quality.is_valid:
-                        raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            detail=f"Invalid {angle} image: Quality score {quality.quality_score}/100"
-                        )
+                except PhotoAnalysisError as e:
+                    logger.error(f"Vision pipeline failed: {str(e)}")
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Photo analysis failed: {str(e)}"
+                    )
 
-                    image_quality[angle] = quality
+            # Steps 10-16: Assemble complete scan result with mathematical analysis
+            async with optimizer.profile("assemble_scan_result"):
+                # Mock image URLs (in production, upload to Firebase Storage first)
+                image_urls = {
+                    "front": f"https://storage.reddyfit.com/{user_id}/{scan_id}/front.jpg",
+                    "side": f"https://storage.reddyfit.com/{user_id}/{scan_id}/side.jpg",
+                    "back": f"https://storage.reddyfit.com/{user_id}/{scan_id}/back.jpg"
+                }
 
-                logger.info(f"All 3 images validated successfully")
+                # Extract quality and angle data from pipeline metadata
+                image_quality = {
+                    angle: ImageQuality(
+                        quality_score=pipeline_metadata['image_quality'][angle],
+                        is_valid=True,
+                        width=1024,  # After preprocessing
+                        height=1024
+                    )
+                    for angle in ["front", "side", "back"]
+                }
 
-            # Step 2: Create mock scan result (for now, until Steps 2-9 are implemented)
-            # TODO: Replace with actual AI processing pipeline
-            async with optimizer.profile("process_scan"):
-                scan_result = await _create_mock_scan_result(
-                    scan_id=scan_id,
+                detected_angles = {
+                    angle: PhotoAngle(
+                        angle_type=AngleType[metadata['angle'].upper()],
+                        confidence=metadata['confidence'],
+                        detected_pose_keypoints=17,
+                        is_standing=True
+                    )
+                    for angle, metadata in pipeline_metadata['angle_detection'].items()
+                }
+
+                # Assemble complete scan result
+                scan_result = assemble_scan_result(
                     user_id=user_id,
-                    images_data=images_data,
+                    measurements=measurements,
+                    confidence=confidence,
+                    image_urls=image_urls,
                     image_quality=image_quality,
-                    height_cm=height_cm,
-                    gender=gender
+                    detected_angles=detected_angles,
+                    height_cm=height_cm or 178,
+                    gender=gender or "male",
+                    processing_time_sec=25.0
                 )
+
+                # Override scan_id
+                scan_result.scan_id = scan_id
 
             # Step 3: Save to Firestore
             async with optimizer.profile("save_to_firestore"):
@@ -214,93 +254,3 @@ async def get_scan(scan_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve scan: {str(e)}"
         )
-
-
-# ============================================================
-# HELPER FUNCTIONS
-# ============================================================
-
-async def _create_mock_scan_result(
-    scan_id: str,
-    user_id: str,
-    images_data: dict,
-    image_quality: dict,
-    height_cm: float = None,
-    gender: str = None
-) -> ScanResult:
-    """
-    Create mock scan result for testing
-    TODO: Replace with actual AI processing pipeline (Steps 2-9)
-    """
-
-    # Mock measurements (in production, from Claude vision)
-    measurements = BodyMeasurements(
-        chest_circumference_cm=105.0,
-        waist_circumference_cm=80.0,
-        hip_circumference_cm=95.0,
-        bicep_circumference_cm=38.0,
-        thigh_circumference_cm=58.0,
-        calf_circumference_cm=38.0,
-        shoulder_width_cm=48.0,
-        body_fat_percent=12.5,
-        estimated_weight_kg=80.0,
-        posture_rating=8.5,
-        muscle_definition="Well-defined"
-    )
-
-    # Mock confidence
-    confidence = ConfidenceMetrics(
-        overall_confidence=0.92,
-        photo_count_factor=1.0,
-        measurement_consistency=0.95,
-        ai_confidence=0.90,
-        data_completeness=0.88,
-        is_reliable=True
-    )
-
-    # Mock detected angles
-    detected_angles = {
-        "front": PhotoAngle(
-            angle_type=AngleType.FRONT,
-            confidence=0.95,
-            detected_pose_keypoints=17,
-            is_standing=True
-        ),
-        "side": PhotoAngle(
-            angle_type=AngleType.SIDE,
-            confidence=0.92,
-            detected_pose_keypoints=15,
-            is_standing=True
-        ),
-        "back": PhotoAngle(
-            angle_type=AngleType.BACK,
-            confidence=0.90,
-            detected_pose_keypoints=16,
-            is_standing=True
-        )
-    }
-
-    # Mock image URLs (in production, upload to Firebase Storage)
-    image_urls = {
-        "front": f"https://storage.reddyfit.com/{user_id}/{scan_id}/front.jpg",
-        "side": f"https://storage.reddyfit.com/{user_id}/{scan_id}/side.jpg",
-        "back": f"https://storage.reddyfit.com/{user_id}/{scan_id}/back.jpg"
-    }
-
-    # Use scan_assembler to create complete result with mathematical analysis
-    scan_result = assemble_scan_result(
-        user_id=user_id,
-        measurements=measurements,
-        confidence=confidence,
-        image_urls=image_urls,
-        image_quality=image_quality,
-        detected_angles=detected_angles,
-        height_cm=height_cm or 178,
-        gender=gender or "male",
-        processing_time_sec=25.0
-    )
-
-    # Override scan_id
-    scan_result.scan_id = scan_id
-
-    return scan_result
