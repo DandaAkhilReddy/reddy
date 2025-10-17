@@ -60,6 +60,22 @@ Multi-agent AI system built with LangChain, LangGraph, and OpenAI GPT-4:
 **Status**: ✅ Foundation complete with mock data, ready for production API integration
 📖 [Read More](features/nutrition-agent/README.md)
 
+### 🚀 REST API (Production Ready - Complete!)
+**FastAPI Backend with Full Authentication**
+
+Production-ready REST API with 11 endpoints:
+- 🔐 **Firebase JWT Authentication**: Secure token-based auth with expiration handling
+- 📸 **Scan Management**: Create, retrieve, list scans with pagination
+- 👤 **User Management**: Profile and scan history endpoints
+- 🔍 **Body Signature Search**: Find similar body types across all users
+- 📊 **Progress Tracking**: Compare scans over time (4-week lookback)
+- 🚦 **Rate Limiting**: Token bucket algorithm (per-user + per-IP protection)
+- 🏥 **Health Checks**: Readiness and liveness probes for Kubernetes
+- 📈 **Metrics**: Performance monitoring and error tracking
+
+**Status**: ✅ All endpoints implemented with auth, validation, and error handling
+📖 [Read More](api/README.md)
+
 ### 💪 Workout AI (Planned)
 **Intelligent Exercise Programming**
 
@@ -75,7 +91,8 @@ Multi-agent AI system built with LangChain, LangGraph, and OpenAI GPT-4:
 ### Prerequisites
 
 - Python 3.10+
-- OpenAI API key (GPT-4o access)
+- Anthropic API key (Claude 3.5 Sonnet access for photo analysis)
+- OpenAI API key (GPT-4 for nutrition agent - optional)
 - Firebase project (for storage & database)
 
 ### Installation
@@ -101,9 +118,12 @@ cp .env.example .env
 Edit `.env` file in `features/photoanalysis/`:
 
 ```env
-# OpenAI Configuration
+# Anthropic Configuration (Claude 3.5 Sonnet for photo analysis)
+ANTHROPIC_API_KEY=sk-ant-api03-your-key-here
+
+# OpenAI Configuration (GPT-4 for nutrition agent - optional)
 OPENAI_API_KEY=sk-your-key-here
-OPENAI_MODEL=gpt-4o
+OPENAI_MODEL=gpt-4-turbo
 
 # Firebase Configuration
 FIREBASE_PROJECT_ID=your-project-id
@@ -113,6 +133,9 @@ FIREBASE_CREDENTIALS_PATH=./firebase-credentials.json
 # Optional: WHOOP API (uses mock data by default)
 WHOOP_CLIENT_ID=your-client-id
 WHOOP_CLIENT_SECRET=your-secret
+
+# Optional: Redis for caching
+REDIS_URL=redis://localhost:6379
 ```
 
 ### Run Photo Analysis
@@ -138,6 +161,36 @@ data = get_mock_whoop_data("user_123", profile_type="athlete_high_recovery")
 print(f"Recovery: {data['recovery_score']}")
 print(f"Strain: {data['strain_score']}")
 print(f"Sleep: {data['sleep_hours']}h")
+```
+
+### Run REST API Server
+
+```bash
+cd features/photoanalysis
+python -m api.main
+
+# Server starts at http://localhost:8000
+# API docs at http://localhost:8000/docs
+```
+
+**Create a body scan via API:**
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/scans" \
+  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
+  -F "front_image=@front.jpg" \
+  -F "side_image=@side.jpg" \
+  -F "back_image=@back.jpg" \
+  -F "user_id=user_123" \
+  -F "height_cm=178" \
+  -F "gender=male"
+```
+
+**Get scan result:**
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/scans/{scan_id}" \
+  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN"
 ```
 
 ## 🏗️ Architecture
@@ -172,6 +225,15 @@ ReddyFit Platform
 │   ├── LangGraph Workflow Orchestration ✅
 │   ├── Body Composition Integration (Photo Analysis) ✅
 │   └── WHOOP Recovery Integration ✅
+│
+├── REST API (FastAPI)
+│   ├── Scan Routes (create, get, list, progress) ✅
+│   ├── User Routes (profile, history) ✅
+│   ├── Search Routes (body signature lookup) ✅
+│   ├── Health Routes (readiness, liveness, metrics) ✅
+│   ├── Firebase JWT Authentication ✅
+│   ├── Token Bucket Rate Limiting ✅
+│   └── CORS & Error Middleware ✅
 │
 ├── WHOOP Integration
 │   ├── Mock Data API ✅
@@ -246,15 +308,43 @@ ReddyFit Platform
 - [x] Performance optimization with caching & parallelization (Step 20)
 - [x] Integration tests (4/4 services implemented)
 
-### Phase 5: Production (Next Priority)
-- [ ] FastAPI REST API endpoints
-- [ ] Authentication & authorization
-- [ ] Production deployment (Firebase + Cloud Run)
-- [ ] Frontend dashboard
-- [ ] Mobile app integration
-- [ ] Real-time progress tracking
-- [ ] Meal tracking & logging
+### Phase 5: REST API & Authentication ✅ (Complete - 100%)
+- [x] FastAPI REST API with 11 production endpoints
+- [x] Firebase JWT authentication middleware
+- [x] Token bucket rate limiting (per-user + per-IP)
+- [x] Multipart file upload handling (3 photos)
+- [x] Health check and metrics endpoints
+- [x] CORS configuration for web clients
+- [x] Error response standardization
+- [x] API versioning (/api/v1)
+
+### Phase 6: Vision Pipeline Integration ✅ (Complete - 100%)
+- [x] Complete Steps 1-9 orchestration workflow
+- [x] User profile validator (Step 4) with WHOOP integration
+- [x] Claude 3.5 Sonnet vision API integration
+- [x] Async/await throughout for optimal performance
+- [x] Error propagation and handling
+- [x] Performance profiling integration
+- [x] End-to-end photo upload to scan result flow
+- [x] Integration tests for vision pipeline
+
+### Phase 7: Production Deployment (Next Priority)
+- [ ] Cloud deployment (Firebase + Cloud Run / AWS Lambda)
+- [ ] CI/CD pipeline setup (GitHub Actions)
+- [ ] Production environment configuration
+- [ ] Database migrations and seeding
+- [ ] API documentation (OpenAPI/Swagger)
+- [ ] Performance benchmarking
+- [ ] Security hardening and penetration testing
+
+### Phase 8: Frontend & Mobile (Future)
+- [ ] React/Next.js dashboard
+- [ ] Mobile app (React Native / Flutter)
+- [ ] Real-time progress tracking UI
+- [ ] Meal tracking & logging interface
 - [ ] Grocery list generation
+- [ ] Social features (compare with friends)
+- [ ] Progress photo timeline
 
 ## 🎯 Success Metrics
 
@@ -312,9 +402,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- OpenAI for GPT-4o vision capabilities
+- Anthropic for Claude 3.5 Sonnet vision capabilities
+- OpenAI for GPT-4 nutrition agent capabilities
 - MediaPipe for pose detection
 - WHOOP for fitness wearable inspiration
+- FastAPI for the amazing async web framework
+- LangChain & LangGraph for multi-agent orchestration
 - Open-source community for amazing tools
 
 ## 📞 Support
