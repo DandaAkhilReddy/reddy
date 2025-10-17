@@ -1,0 +1,187 @@
+# CodeRabbit Configuration for ReddyFit Platform
+# https://docs.coderabbit.ai/guides/configure-coderabbit
+
+language: "en-US"
+early_access: false
+enable_free_tier: true
+
+reviews:
+  profile: "chill"  # Options: chill, assertive
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: true
+  review_status: true
+  collapse_walkthrough: false
+
+  # Auto-review on PR creation
+  auto_review:
+    enabled: true
+    drafts: false  # Don't review draft PRs
+    base_branches:
+      - main
+      - develop
+
+  # Path-based review rules
+  path_instructions:
+    - path: "features/photoanalysis/**"
+      instructions: |
+        Focus on:
+        - Type safety (type hints)
+        - Error handling comprehensiveness
+        - Performance optimization opportunities
+        - Pydantic model validation
+        - OpenAI API best practices
+        - Image processing efficiency
+
+    - path: "features/whoop-integration/**"
+      instructions: |
+        Focus on:
+        - Async/await patterns
+        - API error handling
+        - Mock data realism
+        - Production API compatibility
+
+    - path: "**/*.py"
+      instructions: |
+        General Python review:
+        - PEP 8 compliance
+        - Docstring quality
+        - Security vulnerabilities
+        - Performance bottlenecks
+        - Test coverage gaps
+
+    - path: "tests/**"
+      instructions: |
+        Test quality checks:
+        - Edge case coverage
+        - Mock usage appropriateness
+        - Assertion clarity
+        - Test naming conventions
+
+  # Knowledge base for domain-specific review
+  knowledge_base:
+    - "This is an AI-powered fitness platform using GPT-4o Vision for body composition analysis"
+    - "Target: 95%+ success rate for body scans (up from 37% baseline)"
+    - "Processing time goal: <30 seconds per scan"
+    - "Uses MediaPipe for pose detection and angle classification"
+    - "Integrates with WHOOP API (currently mock data)"
+    - "Mathematical analysis includes Golden Ratio, Adonis Index, symmetry scoring"
+    - "All measurements should be in metric units (cm, kg, %)"
+    - "Security: Never log or store raw user images in plain text"
+
+chat:
+  auto_reply: true
+
+# Issue detection settings
+issues:
+  # Auto-detect common issues
+  auto_detect:
+    enabled: true
+    confidence_threshold: 0.7
+
+  # Create GitHub issues for high-severity findings
+  auto_create:
+    enabled: false  # Manually enable if desired
+    labels:
+      - "coderabbit"
+      - "automated"
+
+# Performance and quality checks
+checks:
+  # Code complexity
+  complexity:
+    enabled: true
+    threshold: 15  # Cyclomatic complexity limit
+
+  # Documentation
+  documentation:
+    enabled: true
+    missing_docstrings: true
+
+  # Security
+  security:
+    enabled: true
+    scan_dependencies: true
+
+  # Performance
+  performance:
+    enabled: true
+    flag_inefficient_loops: true
+    flag_redundant_operations: true
+
+# Tools integration
+tools:
+  # Linters
+  ruff:
+    enabled: true
+    config: "pyproject.toml"
+
+  # Type checking
+  mypy:
+    enabled: true
+    strict: false  # Enable gradually
+
+  # Testing
+  pytest:
+    enabled: true
+    min_coverage: 80
+
+# Tone and style
+tone_instructions: |
+  Be constructive and educational. Focus on:
+  - Explaining WHY changes are suggested, not just WHAT
+  - Providing code examples for complex suggestions
+  - Highlighting positive patterns when found
+  - Prioritizing high-impact issues over nitpicks
+  - Being encouraging for first-time contributors
+
+# Custom rules for this project
+custom_rules:
+  - name: "API Key Security"
+    pattern: "(OPENAI_API_KEY|FIREBASE_CREDENTIALS|WHOOP_CLIENT_SECRET)\\s*=\\s*['\"](?!your_|sk-test)"
+    message: "Potential hardcoded API key detected. Use environment variables."
+    severity: "high"
+
+  - name: "Async Without Await"
+    pattern: "async def.*\\n(?!.*await)"
+    message: "Async function doesn't use await. Consider making it synchronous."
+    severity: "medium"
+
+  - name: "Missing Type Hints"
+    pattern: "def (?!__init__|__str__|__repr__)\\w+\\([^)]*\\)(?!\\s*->)"
+    message: "Consider adding return type hint for better type safety"
+    severity: "low"
+
+  - name: "Hardcoded Thresholds"
+    pattern: "if.*[<>]=?\\s*\\d+\\.\\d+"
+    message: "Consider moving magic numbers to configuration/constants"
+    severity: "low"
+
+# Exclude paths from review
+exclude:
+  - "**/__pycache__/**"
+  - "**/*.pyc"
+  - ".venv/**"
+  - "venv/**"
+  - "dist/**"
+  - "build/**"
+  - ".pytest_cache/**"
+  - "**/*.egg-info/**"
+
+# Review specific file types
+file_types:
+  python:
+    - "*.py"
+  config:
+    - "*.yaml"
+    - "*.yml"
+    - "*.json"
+    - "*.toml"
+  docs:
+    - "*.md"
+    - "*.rst"
+
+# Notifications
+notifications:
+  review_complete: true
+  new_issue: true
