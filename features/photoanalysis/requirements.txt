@@ -9,7 +9,7 @@ Pillow==10.2.0
 mediapipe==0.10.9
 
 # AI & ML
-openai==1.10.0
+anthropic==0.39.0  # Claude API for vision analysis
 numpy==1.26.3
 
 # Firebase

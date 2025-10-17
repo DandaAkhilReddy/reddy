@@ -1,27 +1,27 @@
 """
 Step 5: Build Optimized Vision Prompt
-Engineered prompts for GPT-4o Vision to extract body measurements
+Engineered prompts for Claude Vision to extract body measurements
 """
 from typing import Dict, Any, Optional
 
 
 class VisionPromptEngine:
-    """Generates optimized prompts for GPT-4o Vision analysis"""
+    """Generates optimized prompts for Claude Vision analysis"""
 
     def __init__(self):
-        self.system_prompt = self._build_system_prompt()
         self.user_prompt_template = self._build_user_prompt()
 
     def _build_system_prompt(self) -> str:
         """
-        Build system prompt (<50 tokens for efficiency)
+        Build system prompt (Note: Claude uses system parameter, not system message)
 
         Returns:
             System message string
         """
         return (
-            "You are an expert body composition analyst. "
-            "Analyze physique photos precisely and output valid JSON only."
+            "You are an expert body composition analyst with training in kinesiology and anthropometry. "
+            "Analyze physique photos precisely and output valid JSON only. "
+            "Be accurate, methodical, and data-driven in your assessments."
         )
 
     def _build_user_prompt(self) -> str:
@@ -50,33 +50,20 @@ Output ONLY a valid JSON object with these exact fields:
 
 All measurements in centimeters. Be precise. No explanation, only JSON."""
 
-    def build_messages(
+    def build_prompt(
         self,
-        images_base64: list[str],
         user_context: Optional[Dict[str, Any]] = None
-    ) -> list[Dict[str, Any]]:
+    ) -> str:
         """
-        Build complete message array for GPT-4o
+        Build complete text prompt for Claude (images passed separately)
 
         Args:
-            images_base64: List of 3 base64-encoded images
             user_context: Optional context (height, gender, etc.)
 
         Returns:
-            Messages array for OpenAI API
+            Complete text prompt
         """
-        # System message
-        messages = [
-            {
-                "role": "system",
-                "content": self.system_prompt
-            }
-        ]
-
-        # User message with images
-        content = []
-
-        # Add text prompt
+        # Start with template
         user_prompt = self.user_prompt_template
 
         # Optionally enhance with user context
@@ -85,27 +72,7 @@ All measurements in centimeters. Be precise. No explanation, only JSON."""
             if context_str:
                 user_prompt = f"{context_str}\n\n{user_prompt}"
 
-        content.append({
-            "type": "text",
-            "text": user_prompt
-        })
-
-        # Add images
-        for idx, img_b64 in enumerate(images_base64):
-            content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{img_b64}",
-                    "detail": "high"  # High detail for precise measurements
-                }
-            })
-
-        messages.append({
-            "role": "user",
-            "content": content
-        })
-
-        return messages
+        return user_prompt
 
     def _format_context(self, context: Dict[str, Any]) -> str:
         """
@@ -149,18 +116,16 @@ All measurements in centimeters. Be precise. No explanation, only JSON."""
 vision_prompt_engine = VisionPromptEngine()
 
 
-def build_vision_messages(
-    images_base64: list[str],
+def build_vision_prompt(
     user_context: Optional[Dict[str, Any]] = None
-) -> list[Dict[str, Any]]:
+) -> str:
     """
-    Convenience function to build GPT-4o messages
+    Convenience function to build Claude vision prompt
 
     Args:
-        images_base64: List of base64 images
         user_context: Optional user context
 
     Returns:
-        OpenAI messages array
+        Text prompt for Claude
     """
-    return vision_prompt_engine.build_messages(images_base64, user_context)
+    return vision_prompt_engine.build_prompt(user_context)

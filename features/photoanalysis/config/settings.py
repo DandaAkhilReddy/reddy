@@ -10,12 +10,12 @@ from pathlib import Path
 class Settings(BaseSettings):
     """Application settings with validation"""
 
-    # OpenAI Configuration
-    openai_api_key: str
-    openai_model: str = "gpt-4o"
-    openai_temperature: float = 0.3
-    openai_max_tokens: int = 2000
-    openai_timeout: int = 45
+    # Anthropic Configuration (Photo Analysis)
+    anthropic_api_key: str
+    anthropic_model: str = "claude-3-5-sonnet-20241022"
+    anthropic_temperature: float = 0.3
+    anthropic_max_tokens: int = 2000
+    anthropic_timeout: int = 45
 
     # Firebase Configuration
     firebase_project_id: str
@@ -83,8 +83,8 @@ def validate_settings():
     """Validate that critical settings are properly configured"""
     errors = []
 
-    if not settings.openai_api_key or settings.openai_api_key == "your_openai_api_key_here":
-        errors.append("OPENAI_API_KEY is not configured")
+    if not settings.anthropic_api_key or settings.anthropic_api_key == "your_anthropic_api_key_here":
+        errors.append("ANTHROPIC_API_KEY is not configured")
 
     if not settings.firebase_credentials_path.exists():
         errors.append(f"Firebase credentials file not found: {settings.firebase_credentials_path}")
