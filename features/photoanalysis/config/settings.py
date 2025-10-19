@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     # Firebase Configuration
     firebase_project_id: str
     firebase_storage_bucket: str
-    firebase_credentials_path: Path
+    firebase_credentials_path: Optional[Path] = None
 
     # WHOOP API Configuration
     whoop_client_id: Optional[str] = None
@@ -78,6 +78,16 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
+def get_settings() -> Settings:
+    """
+    Get settings instance (for dependency injection)
+
+    Returns:
+        Global settings instance
+    """
+    return settings
+
+
 # Validate critical settings on import
 def validate_settings():
     """Validate that critical settings are properly configured"""
@@ -86,7 +96,8 @@ def validate_settings():
     if not settings.anthropic_api_key or settings.anthropic_api_key == "your_anthropic_api_key_here":
         errors.append("ANTHROPIC_API_KEY is not configured")
 
-    if not settings.firebase_credentials_path.exists():
+    # Only validate Firebase credentials file if path is provided
+    if settings.firebase_credentials_path and not settings.firebase_credentials_path.exists():
         errors.append(f"Firebase credentials file not found: {settings.firebase_credentials_path}")
 
     if errors:
