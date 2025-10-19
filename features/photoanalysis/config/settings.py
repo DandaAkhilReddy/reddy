@@ -3,6 +3,7 @@ Configuration management for ReddyFit Body Scan Analysis
 Loads environment variables and provides typed settings
 """
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 from typing import Optional
 from pathlib import Path
 
@@ -67,6 +68,14 @@ class Settings(BaseSettings):
     weight_symmetry: float = 0.30
     weight_composition: float = 0.20
     weight_posture: float = 0.10
+
+    @field_validator('firebase_credentials_path', mode='before')
+    @classmethod
+    def validate_credentials_path(cls, v):
+        """Allow empty or missing firebase credentials path for cloud deployments"""
+        if not v or v == "":
+            return None
+        return Path(v)
 
     class Config:
         env_file = ".env"
