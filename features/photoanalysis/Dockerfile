@@ -11,15 +11,16 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install system dependencies required for OpenCV and MediaPipe
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # OpenCV dependencies
-    libgl1-mesa-glx \
+    # OpenCV dependencies (updated for Debian Trixie)
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
-    libxrender-dev \
+    libxrender1 \
     libgomp1 \
-    # MediaPipe dependencies
-    libopencv-dev \
+    # Additional libraries for image processing
+    libgstreamer1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
     # General utilities
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -42,11 +43,10 @@ COPY services ./services
 COPY utils ./utils
 COPY api ./api
 
-# Copy environment file (will be overridden by secrets in production)
-COPY .env.example .env
-
 # Create necessary directories
 RUN mkdir -p /app/logs /app/cache
+
+# Note: .env file not needed - using Fly.io secrets instead
 
 # Expose port (Fly.io uses PORT environment variable)
 EXPOSE 8000
@@ -57,4 +57,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Run the application with uvicorn
 # Use exec form to ensure proper signal handling
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Note: Running from /app with PYTHONPATH ensures imports work correctly
+ENV PYTHONPATH=/app
+CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
