@@ -29,19 +29,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy requirements file
-COPY requirements.txt .
+COPY requirements.txt ./photoanalysis/
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r ./photoanalysis/requirements.txt
 
-# Copy application code
-# Note: We need to maintain the package structure
-COPY __init__.py ./
-COPY config ./config
-COPY models ./models
-COPY services ./services
-COPY utils ./utils
-COPY api ./api
+# Copy application code as a package
+# Maintains proper Python package structure for relative imports
+COPY __init__.py ./photoanalysis/
+COPY config ./photoanalysis/config
+COPY models ./photoanalysis/models
+COPY services ./photoanalysis/services
+COPY utils ./photoanalysis/utils
+COPY api ./photoanalysis/api
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/cache
@@ -57,6 +57,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Run the application with uvicorn
 # Use exec form to ensure proper signal handling
-# Note: Running from /app with PYTHONPATH ensures imports work correctly
-ENV PYTHONPATH=/app
-CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Run from /app so photoanalysis is a proper Python package
+CMD ["python", "-m", "uvicorn", "photoanalysis.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
