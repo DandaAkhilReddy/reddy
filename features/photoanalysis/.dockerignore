@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+venv311/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Environment files (secrets handled separately)
+.env.example
+
+# Logs
+*.log
+logs/
+
+# Cache
+.cache/
+*.cache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+test_*.py
+*_test.py
+tests/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Deployment
+.dockerignore
+Dockerfile
+docker-compose.yml
+fly.toml
+deploy.sh
+
+# Scripts
+setup-python311.bat
+start-api*.bat
+test-api.bat
+
+# Guides and documentation
+*_GUIDE.md
+*_STATUS.md
+QUICK_START.md
+DEPLOYMENT*.md
