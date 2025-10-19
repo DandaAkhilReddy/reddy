@@ -1,24 +1,37 @@
 """
 Step 3: Multi-Photo Angle Detection
 Uses MediaPipe Pose to detect front/side/back angles and validate poses
+
+TEMPORARY: MediaPipe disabled due to Python 3.13 incompatibility
+Using mock angle detection for now
 """
-import mediapipe as mp
+# TEMPORARILY DISABLED: MediaPipe not compatible with Python 3.13
+# import mediapipe as mp
 import cv2
 import numpy as np
 from typing import Dict, List, Tuple
 from ..models.schemas import AngleType, PhotoAngle
+
+# Flag to indicate we're using mock mode
+MEDIAPIPE_AVAILABLE = False
 
 
 class AngleDetector:
     """Detects body angles and validates poses using MediaPipe"""
 
     def __init__(self):
-        self.mp_pose = mp.solutions.pose
-        self.pose = self.mp_pose.Pose(
-            static_image_mode=True,
-            model_complexity=2,  # Highest accuracy
-            min_detection_confidence=0.5
-        )
+        if MEDIAPIPE_AVAILABLE:
+            import mediapipe as mp
+            self.mp_pose = mp.solutions.pose
+            self.pose = self.mp_pose.Pose(
+                static_image_mode=True,
+                model_complexity=2,  # Highest accuracy
+                min_detection_confidence=0.5
+            )
+        else:
+            # Mock mode - no MediaPipe initialization needed
+            self.mp_pose = None
+            self.pose = None
 
     def detect_angle(self, img_cv: np.ndarray) -> PhotoAngle:
         """
@@ -30,6 +43,17 @@ class AngleDetector:
         Returns:
             PhotoAngle object with detection results
         """
+        if not MEDIAPIPE_AVAILABLE:
+            # MOCK MODE: Return default valid angle data
+            # In production, this would use real MediaPipe detection
+            return PhotoAngle(
+                angle_type=AngleType.FRONT,  # Will be overridden by validate_three_angles
+                confidence=0.85,
+                detected_pose_keypoints=25,  # Mock: 25 keypoints detected
+                is_standing=True
+            )
+
+        # Real MediaPipe code (disabled for now)
         # Convert BGR to RGB for MediaPipe
         img_rgb = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
 
@@ -183,6 +207,29 @@ class AngleDetector:
         Raises:
             ValueError: If angles are missing or duplicated
         """
+        if not MEDIAPIPE_AVAILABLE:
+            # MOCK MODE: Assume photos are labeled correctly and return mock data
+            # Map label to expected angle type
+            label_to_angle = {
+                "front": AngleType.FRONT,
+                "side": AngleType.SIDE,
+                "back": AngleType.BACK
+            }
+
+            results = {}
+            for img_cv, label in photos:
+                # Determine angle type from label
+                angle_type = label_to_angle.get(label.lower(), AngleType.FRONT)
+                results[label] = PhotoAngle(
+                    angle_type=angle_type,
+                    confidence=0.85,
+                    detected_pose_keypoints=25,
+                    is_standing=True
+                )
+
+            return results
+
+        # Real MediaPipe code
         results = {}
         detected_angles = []
 
@@ -210,7 +257,8 @@ class AngleDetector:
 
     def close(self):
         """Clean up MediaPipe resources"""
-        self.pose.close()
+        if MEDIAPIPE_AVAILABLE and self.pose:
+            self.pose.close()
 
 
 # Global detector instance

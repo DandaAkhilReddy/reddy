@@ -136,12 +136,25 @@ class PersonalizedRecommendations(BaseModel):
 
 class ConfidenceMetrics(BaseModel):
     """Confidence scoring (Step 9)"""
-    overall_confidence: float = Field(ge=0, le=1)
+    overall_score: float = Field(ge=0, le=1)
     photo_count_factor: float = Field(ge=0, le=1)
-    measurement_consistency: float = Field(ge=0, le=1)
-    ai_confidence: float = Field(ge=0, le=1)
-    data_completeness: float = Field(ge=0, le=1)
-    is_reliable: bool
+    consistency_factor: float = Field(ge=0, le=1)
+    ai_confidence_factor: float = Field(ge=0, le=1)
+    data_completeness_factor: float = Field(ge=0, le=1)
+    validation_quality_factor: float = Field(ge=0, le=1)
+    meets_threshold: bool
+    factors_breakdown: Dict[str, Any]
+
+    # Backward compatibility properties
+    @property
+    def overall_confidence(self) -> float:
+        """Alias for overall_score (backward compatibility)"""
+        return self.overall_score
+
+    @property
+    def measurement_completeness(self) -> float:
+        """Alias for data_completeness_factor (backward compatibility)"""
+        return self.data_completeness_factor
 
 
 class ScanResult(BaseModel):

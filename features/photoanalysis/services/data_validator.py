@@ -5,7 +5,7 @@ Validates and normalizes GPT-4o extracted measurements
 import logging
 from typing import Dict, Any, Optional, List, Tuple
 from pydantic import ValidationError
-from ..models.schemas import BodyMeasurements, MuscleDefinition
+from ..models.schemas import BodyMeasurements
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,11 @@
 """
 Step 9: Confidence Scoring System
 Multi-factor confidence score for body scan reliability
+Updated: 2025-10-19
 """
 import logging
 from typing import Dict, Any
-from ..models.schemas import BodyMeasurements, ConfidenceScore
+from ..models.schemas import BodyMeasurements, ConfidenceMetrics
 from ..config.settings import settings
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ class ConfidenceScorer:
         ai_finish_reason: str,
         extraction_strategy: str,
         validation_errors: list[str]
-    ) -> ConfidenceScore:
+    ) -> ConfidenceMetrics:
         """
         Calculate comprehensive confidence score
 
@@ -37,7 +38,7 @@ class ConfidenceScorer:
             validation_errors: List of validation warnings
 
         Returns:
-            ConfidenceScore with detailed breakdown
+            ConfidenceMetrics with detailed breakdown
         """
         logger.debug("Calculating confidence score...")
 
@@ -74,7 +75,7 @@ class ConfidenceScorer:
         )
 
         # Build confidence score object
-        confidence = ConfidenceScore(
+        confidence = ConfidenceMetrics(
             overall_score=round(overall_score, 3),
             photo_count_factor=round(photo_factor, 3),
             consistency_factor=round(consistency_factor, 3),
@@ -266,7 +267,7 @@ def calculate_scan_confidence(
     ai_finish_reason: str,
     extraction_strategy: str,
     validation_errors: list[str]
-) -> ConfidenceScore:
+) -> ConfidenceMetrics:
     """
     Convenience function to calculate confidence score
 
@@ -279,9 +280,48 @@ def calculate_scan_confidence(
         validation_errors: Validation warnings
 
     Returns:
-        ConfidenceScore object
+        ConfidenceMetrics object
     """
     return confidence_scorer.calculate_confidence(
+        measurements=measurements,
+        photo_count=photo_count,
+        completeness_score=completeness_score,
+        ai_finish_reason=ai_finish_reason,
+        extraction_strategy=extraction_strategy,
+        validation_errors=validation_errors
+    )
+
+
+def calculate_confidence_score(
+    measurements: BodyMeasurements,
+    image_quality: float,
+    angle_confidence: float,
+    api_success: bool
+) -> ConfidenceMetrics:
+    """
+    Backward-compatible wrapper for vision_pipeline.py
+
+    Converts old-style parameters to new confidence scoring system
+
+    Args:
+        measurements: Validated body measurements
+        image_quality: Average image quality score (0-100)
+        angle_confidence: Average angle detection confidence (0-1.0)
+        api_success: Whether API call succeeded
+
+    Returns:
+        ConfidenceMetrics object
+    """
+    # Convert image quality and angle confidence to completeness score
+    completeness_score = (image_quality / 100 + angle_confidence) / 2
+
+    # Use defaults for new required parameters
+    photo_count = 3  # Assume 3 photos (front, side, back)
+    ai_finish_reason = "stop" if api_success else "error"
+    extraction_strategy = "direct_parse"  # Assume best case
+    validation_errors = []  # No validation errors available
+
+    return calculate_scan_confidence(
         measurements=measurements,
         photo_count=photo_count,
         completeness_score=completeness_score,

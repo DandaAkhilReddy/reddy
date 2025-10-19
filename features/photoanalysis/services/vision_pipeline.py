@@ -1,6 +1,7 @@
 """
 Vision Pipeline Orchestrator (Steps 1-9)
 Complete workflow from uploaded photos to validated body measurements
+Updated: 2025-10-19
 """
 import logging
 import base64
@@ -20,11 +21,11 @@ from ..utils.angle_detector import detect_angles
 from .user_profile_validator import validate_user_profile
 from .vision_prompt import build_vision_prompt
 from .claude_vision_client import call_claude_vision
-from .json_extractor import extract_measurements_from_response
-from .data_validator import validate_body_measurements
-from .confidence_scorer import calculate_confidence_score
+from .json_extractor import extract_json
+from .data_validator import validate_measurements
+from .confidence_scorer import calculate_scan_confidence
 from .performance_optimizer import get_performance_optimizer
-from .error_handler import get_error_handler, PhotoAnalysisError, VisionAPIError
+from .error_handler import get_error_handler, PhotoAnalysisError, AIAnalysisError
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ class VisionPipeline:
 
         Raises:
             PhotoAnalysisError: If pipeline fails at any step
-            VisionAPIError: If Claude Vision API fails
+            AIAnalysisError: If Claude Vision API fails
         """
         logger.info(f"🚀 Starting vision pipeline for user {user_id}")
 
@@ -432,12 +433,18 @@ class VisionPipeline:
     async def _step7_extract_json(self, vision_response: str) -> Dict[str, Any]:
         """Step 7: Extract JSON measurements from response"""
 
-        raw_measurements = await asyncio.to_thread(
-            extract_measurements_from_response, vision_response
+        raw_measurements, strategy = await asyncio.to_thread(
+            extract_json, vision_response
         )
 
+        if not raw_measurements:
+            raise PhotoAnalysisError(
+                "Failed to extract JSON from Claude Vision response",
+                step="step_7_json_extraction"
+            )
+
         logger.info(
-            f"✅ Step 7 complete | Extracted {len(raw_measurements)} fields"
+            f"✅ Step 7 complete | Extracted {len(raw_measurements)} fields | Strategy: {strategy}"
         )
 
         return raw_measurements
@@ -449,14 +456,19 @@ class VisionPipeline:
     ) -> BodyMeasurements:
         """Step 8: Validate and convert measurements to schema"""
 
-        validated_measurements = await asyncio.to_thread(
-            validate_body_measurements,
-            raw_measurements,
-            user_profile.height_cm
+        validated_measurements, errors, completeness = await asyncio.to_thread(
+            validate_measurements,
+            raw_measurements
         )
 
+        if not validated_measurements:
+            raise PhotoAnalysisError(
+                f"Measurement validation failed: {errors}",
+                step="step_8_schema_validation"
+            )
+
         logger.info(
-            f"✅ Step 8 complete | All measurements validated"
+            f"✅ Step 8 complete | All measurements validated | Completeness: {completeness:.2%}"
         )
 
         return validated_measurements

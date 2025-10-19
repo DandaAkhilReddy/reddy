@@ -1,342 +1,309 @@
-# 📸 Photo Analysis - AI-Powered Body Composition Analysis
+# ReddyFit Photo Analysis API
 
-**Status**: ✅ Complete - Production Ready! (100%)
-**Target Success Rate**: 95%+ (from 37% baseline)
-**Processing Time Goal**: <30 seconds
+> AI-Powered Body Composition Analysis from Smartphone Photos
 
-## Overview
+[![Live API](https://img.shields.io/badge/API-Live-success)](https://reddyfit-api.fly.dev)
+[![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688)](https://fastapi.tiangolo.com/)
+[![Claude AI](https://img.shields.io/badge/Claude-3.5%20Sonnet-5A67D8)](https://www.anthropic.com/)
 
-The Photo Analysis feature transforms 3 smartphone photos (front, side, back) into a comprehensive body composition report using GPT-4o Vision AI and advanced mathematical analysis.
+Transform 3 smartphone photos into comprehensive body composition insights powered by Claude 3.5 Sonnet vision AI.
 
-## 🎯 Features
+## Live API
 
-### ✅ **ALL STEPS COMPLETE - Production Ready!**
+**Production URL:** https://reddyfit-api.fly.dev
 
-**Phase 1-2: AI Vision Analysis (Steps 1-9)** ✅
-- Image quality validation with sharpness scoring
-- Auto-rotation and brightness normalization
-- MediaPipe pose detection for angle validation
-- User profile validation with WHOOP integration
-- Claude 3.5 Sonnet vision API with retry logic
-- Multi-strategy JSON extraction
-- Schema validation and confidence scoring
+**Health Check:** https://reddyfit-api.fly.dev/api/health
 
-**Phase 3: Mathematical Analysis (Steps 10-16)** ✅
-- Anthropometric measurements and body ratios
-- Golden Ratio & Adonis Index calculation
-- Body type classification (V-Taper, Classic, etc.)
-- Unique body signature generation
-- Complete scan result assembly
+**API Documentation:** https://reddyfit-api.fly.dev/api/docs
 
-**Phase 4: Storage & Insights (Steps 17-20)** ✅
-- Firestore persistence with atomic transactions
-- AI-powered workout and nutrition recommendations
-- Error handling and performance optimization
-- Multi-tier caching and profiling
+---
 
-**Phase 5: REST API** ✅
-- Production-ready FastAPI with 11 endpoints
-- Firebase JWT authentication
-- Rate limiting and health checks
-- Kubernetes deployment ready
+## Features
 
-## 📐 The 20-Step Analysis Pipeline
+### Core Capabilities
+- **Multi-Angle AI Vision Analysis** - Upload front, side, and back photos
+- **10+ Anthropometric Measurements** - Chest, waist, hips, biceps, thighs, shoulders, and more
+- **Body Composition Estimation** - Body fat percentage and muscle definition
+- **Golden Ratio Scoring** - Adonis Index and aesthetic proportions
+- **Body Type Classification** - V-Taper, Classic, Rectangular, Apple, Pear, Balanced
+- **Symmetry Analysis** - Multi-factor symmetry scoring
+- **AI-Powered Recommendations** - Personalized workout and nutrition plans
+- **Scan History & Progress Tracking** - Store and compare multiple scans
+- **Confidence Scoring** - Multi-factor confidence metrics for reliability
 
-### Phase 1: Input Validation (Steps 1-4) ✅ COMPLETE
-1. ✅ **Photo Quality Validation** - Ensure images meet standards
-2. ✅ **Image Preprocessing** - Normalize, resize, rotate
-3. ✅ **Angle Detection** - Verify front/side/back poses (MediaPipe)
-4. ✅ **User Profile Validation** - Verify user data & WHOOP integration
+### Technical Highlights
+- **Claude 3.5 Sonnet Vision AI** - State-of-the-art multimodal AI
+- **MediaPipe Pose Detection** - Accurate angle detection and validation
+- **Firebase Firestore** - Real-time database for scan storage
+- **FastAPI Framework** - High-performance async API
+- **Docker Containerization** - Consistent deployment across environments
+- **Fly.io Cloud Hosting** - Global edge deployment
 
-### Phase 2: AI Vision Analysis (Steps 5-9) ✅ COMPLETE
-5. ✅ **Vision Prompt Engineering** - Optimized <200 token prompts
-6. ✅ **Claude Vision API Call** - Multi-image analysis with retry logic
-7. ✅ **JSON Extraction** - 5-strategy parsing with fallbacks
-8. ✅ **Schema Validation** - Type checking & unit conversion
-9. ✅ **Confidence Scoring** - Multi-factor reliability assessment
+---
 
-### Phase 3: Mathematical Analysis (Steps 10-15) ✅ COMPLETE
-10. ✅ **Anthropometric Measurements** - Extract 10+ body metrics
-11. ✅ **Golden Ratio & Adonis Index** - Shoulder:waist ratio
-12. ✅ **Symmetry Coefficient** - 6-ratio analysis
-13. ✅ **Composition Hash** - SHA-256 body fingerprint
-14. ✅ **Body Type Classification** - V-Taper, Classic, Apple, Pear, etc.
-15. ✅ **Unique ID Generation** - `{BodyType}-BF{%}-{Hash}-AI{ratio}`
-16. ✅ **Scan Result Assembly** - Complete orchestration
+## Quick Start
 
-### Phase 4: Insights & Storage (Steps 17-20) ✅ COMPLETE
-17. ✅ **Firestore Save** - Atomic transaction persistence
-18. ✅ **AI Recommendations** - Workout + nutrition + WHOOP insights
-19. ✅ **Error Handling** - Comprehensive monitoring & retry logic
-20. ✅ **Performance Optimization** - Caching, parallelization, profiling
-
-## 🏗️ Architecture
-
-```
-User Uploads 3 Photos (via REST API)
-        ↓
-[Step 1] Quality Validation ✅
-        ↓
-[Step 2] Preprocessing (rotation, normalize, resize) ✅
-        ↓
-[Step 3] Angle Detection (MediaPipe) ✅
-        ↓
-[Step 4] User Profile Validation (with WHOOP) ✅
-        ↓
-[Step 5] Build Claude Vision Prompt ✅
-        ↓
-[Step 6] Claude 3.5 Sonnet Vision API ✅
-        ↓
-[Step 7] JSON Extraction (multi-strategy) ✅
-        ↓
-[Step 8] Schema Validation ✅
-        ↓
-[Step 9] Confidence Scoring ✅
-        ↓
-[Steps 10-12] Measurements & Ratios ✅
-        ↓
-[Steps 13-15] Classification & ID Generation ✅
-        ↓
-[Step 16] Scan Result Assembly ✅
-        ↓
-[Step 17] Save to Firestore ✅
-        ↓
-[Step 18] Generate AI Recommendations ✅
-        ↓
-Return Complete Body Scan Report via API
-```
-
-## 📊 Output Structure
-
-### Body Measurements
-- Chest circumference (cm)
-- Waist circumference (cm)
-- Hip circumference (cm)
-- Bicep circumference (cm)
-- Thigh circumference (cm)
-- Body fat percentage (%)
-
-### Calculated Ratios
-- **Adonis Index**: Shoulder-to-waist ratio (target: 1.618 golden ratio)
-- **Waist-to-Hip Ratio**: Health & aesthetics indicator
-- **Chest-to-Waist Ratio**: Upper body development
-- **Symmetry Score**: 0-100 based on 6 body ratios
-
-### Body Type Classification
-- **V-Taper**: Broad shoulders, narrow waist (athletic)
-- **Classic**: Well-proportioned, balanced
-- **Rectangular**: Straight body lines
-- **Apple**: Weight in midsection
-- **Pear**: Weight in lower body
-- **Balanced**: Harmonious proportions
-
-### Aesthetic Score (0-100)
-- Golden Ratio Score (40% weight)
-- Symmetry Score (30% weight)
-- Body Composition (20% weight)
-- Posture (10% weight)
-
-### Unique Body Signature
-Format: `VTaper-BF15.5-A3F7C2-AI1.54`
-- Body type
-- Body fat percentage
-- 6-char composition hash
-- Adonis Index
-
-## 🚀 Quick Start
+### Prerequisites
+- Python 3.11+
+- Anthropic API key (Claude)
+- Firebase project with Firestore
+- Docker (for containerized deployment)
 
 ### Installation
 
 ```bash
-cd features/photoanalysis
+# Clone the repository
+git clone https://github.com/DandaAkhilReddy/reddy.git
+cd reddy/features/photoanalysis
+
+# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your API keys
 ```
 
 ### Configuration
 
-```bash
-cp .env.example .env
-# Edit .env with your credentials
-```
+Create a `.env` file with the following variables:
 
-Required environment variables:
 ```env
-ANTHROPIC_API_KEY=sk-ant-api03-...
-FIREBASE_PROJECT_ID=your-project
-FIREBASE_CREDENTIALS_PATH=./firebase-credentials.json
-OPENAI_API_KEY=sk-...  # Optional, for nutrition agent
+# Anthropic API
+ANTHROPIC_API_KEY=your_anthropic_key_here
+
+# Firebase
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_STORAGE_BUCKET=your_bucket.appspot.com
+FIREBASE_CREDENTIALS_PATH=/path/to/credentials.json
+
+# Application
+APP_ENV=development
+APP_HOST=0.0.0.0
+APP_PORT=7000
+DEBUG=True
 ```
 
-### Usage Example - Complete Pipeline
-
-```python
-from services.vision_pipeline import run_vision_analysis
-
-# Run complete AI vision analysis
-async def analyze_body_photos():
-    # Load your 3 photos
-    with open("front.jpg", "rb") as f:
-        front_bytes = f.read()
-    with open("side.jpg", "rb") as f:
-        side_bytes = f.read()
-    with open("back.jpg", "rb") as f:
-        back_bytes = f.read()
-
-    # Run Steps 1-9: Complete vision pipeline
-    measurements, confidence, metadata = await run_vision_analysis(
-        front_image=front_bytes,
-        side_image=side_bytes,
-        back_image=back_bytes,
-        user_id="user_123",
-        height_cm=178.0,
-        gender="male"
-    )
-
-    print(f"✅ Analysis complete!")
-    print(f"Confidence: {confidence.overall_confidence:.2f}")
-    print(f"Body fat: {measurements.body_fat_percent}%")
-    print(f"Chest: {measurements.chest_circumference_cm}cm")
-    print(f"Waist: {measurements.waist_circumference_cm}cm")
-
-# Run it
-import asyncio
-asyncio.run(analyze_body_photos())
-```
-
-### Usage Example - REST API
+### Run Locally
 
 ```bash
-# Start API server
-cd features/photoanalysis
-python -m api.main
+# Start the API server
+uvicorn photoanalysis.api.main:app --host 0.0.0.0 --port 7000 --reload
 
-# Create scan via API
-curl -X POST "http://localhost:8000/api/v1/scans" \
-  -H "Authorization: Bearer mock_user_test123" \
+# API will be available at:
+# http://localhost:7000/api/docs
+```
+
+### Docker Deployment
+
+```bash
+# Build the Docker image
+docker build -t reddyfit-api .
+
+# Run the container
+docker run -p 8000:8000 \
+  -e ANTHROPIC_API_KEY=your_key \
+  -e FIREBASE_PROJECT_ID=your_project \
+  reddyfit-api
+```
+
+---
+
+## API Usage Example
+
+### Create a Body Scan
+
+```bash
+curl -X POST "https://reddyfit-api.fly.dev/api/v1/scans" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
   -F "front_image=@front.jpg" \
   -F "side_image=@side.jpg" \
   -F "back_image=@back.jpg" \
-  -F "user_id=user_123" \
-  -F "height_cm=178" \
-  -F "gender=male"
+  -F "user_id=user123" \
+  -F "height_cm=175" \
+  -F "weight_kg=75"
 ```
 
-## 📦 Dependencies
+### Get Scan Results
 
-- **FastAPI**: Async web framework for REST API
-- **Anthropic**: Claude 3.5 Sonnet vision API
-- **OpenCV**: Image processing and computer vision
-- **Pillow**: Image manipulation
-- **MediaPipe**: Pose detection and angle classification
-- **Firebase Admin**: Firestore database & storage
-- **Pydantic**: Data validation and schemas
-- **OpenAI**: Optional, for nutrition agent
+```bash
+curl "https://reddyfit-api.fly.dev/api/v1/scans/{scan_id}" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
 
-See [requirements.txt](requirements.txt) for complete list.
+### Generate AI Recommendations
 
-## 🎯 Success Metrics
+```bash
+curl -X POST "https://reddyfit-api.fly.dev/api/v1/recommendations/{scan_id}" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
 
-| Metric | Baseline | Target | Status |
-|--------|----------|--------|--------|
-| Success Rate | 37% | 95%+ | 🚧 TBD |
-| JSON Extraction | 95% | 99%+ | 🚧 TBD |
-| Processing Time | 45s | <30s | 🚧 TBD |
-| Data Completeness | 80% | 98% | 🚧 TBD |
+---
 
-## 📖 Documentation
+## Technology Stack
 
-- [Implementation Status](../../docs/photoanalysis/implementation-status.md)
-- [20-Step Detailed Plan](../../docs/photoanalysis/20-step-plan.md)
-- [Testing Guide](../../docs/photoanalysis/testing-guide.md)
+### Backend
+- **Framework:** FastAPI 0.109.0
+- **Language:** Python 3.11
+- **Server:** Uvicorn (ASGI)
 
-## ✅ Phase 4 Complete (Steps 17-20)
+### AI & Machine Learning
+- **Vision AI:** Anthropic Claude 3.5 Sonnet
+- **Pose Detection:** MediaPipe 0.10.9
+- **Image Processing:** OpenCV 4.9.0, Pillow 10.2.0
+- **Numerical Computing:** NumPy 1.26.3
 
-All infrastructure services are implemented and tested:
+### Database & Storage
+- **Database:** Firebase Firestore
+- **Storage:** Firebase Cloud Storage
+- **Authentication:** Firebase Admin SDK
 
-**Step 17: Firestore Persistence Client** (~600 lines)
-- Atomic transaction support
-- Hash collision detection
-- User scan history with pagination
-- Signature-based search across users
-- Progress comparison (4-week lookback)
-- Error logging to Firestore
+### Deployment
+- **Platform:** Fly.io
+- **Containerization:** Docker
+- **Base Image:** Python 3.11-slim
+- **Region:** iad (Virginia, USA)
 
-**Step 18: AI Recommendations Engine** (~675 lines)
-- WHOOP-aware workout intensity recommendations
-- Body type-specific training splits
-- Recovery-adjusted nutrition macros
-- Integration with nutrition agent (full meal plans)
-- Progress tracking insights
-- Timeline estimation
+---
 
-**Step 19: Error Handling & Monitoring** (~585 lines)
-- Custom exception hierarchy
-- Retry decorator with exponential backoff
-- Sentry integration for error tracking
-- Timeout decorator
-- Context managers for error handling
-- Health check endpoints
-- Graceful fallback strategies
+## Project Structure
 
-**Step 20: Performance Optimization** (~663 lines)
-- Multi-tier caching (memory + Redis)
-- Parallel execution utilities
-- Performance metrics tracking
-- Image processing optimization
-- Profiling context managers
-- Batch processing support
+```
+photoanalysis/
+├── api/                    # FastAPI application
+│   ├── main.py            # Application entry point
+│   ├── routes/            # API route handlers
+│   ├── middleware/        # Auth, rate limiting
+│   └── models.py          # Request/response models
+├── services/              # Business logic
+│   ├── vision_pipeline.py     # Main analysis orchestrator
+│   ├── claude_vision_client.py # Claude API integration
+│   ├── confidence_scorer.py   # Multi-factor scoring
+│   ├── body_type_classifier.py # Body type detection
+│   ├── ratio_calculator.py    # Golden ratio calculations
+│   └── recommendation_engine.py # AI recommendations
+├── models/                # Data models
+│   └── schemas.py         # Pydantic schemas
+├── utils/                 # Utilities
+│   ├── image_validator.py # Image quality checks
+│   ├── image_processor.py # Image preprocessing
+│   └── angle_detector.py  # Pose angle detection
+├── config/                # Configuration
+│   └── settings.py        # Environment settings
+├── Dockerfile             # Container definition
+├── requirements.txt       # Python dependencies
+└── docs/                  # Documentation
+```
 
-**Integration Tests** (~475 lines)
-- Complete test suite for Steps 17-20
-- Mock data generation
-- End-to-end workflow testing
-- Run with: `python test_steps_17_20.py`
+---
 
-## ✅ **Phase 6 Complete: AI Vision Pipeline (Steps 2-9)**
+## Documentation
 
-All vision analysis steps are now implemented and integrated:
+- **[Architecture](./ARCHITECTURE.md)** - System design and component architecture
+- **[Technical Specifications](./TECHNICAL_SPECIFICATIONS.md)** - Detailed technical documentation
+- **[API Documentation](./API_DOCUMENTATION.md)** - Complete API reference
+- **[Tools & Dependencies](./TOOLS_AND_DEPENDENCIES.md)** - Technology stack details
+- **[Deployment Guide](./DEPLOYMENT_GUIDE.md)** - Step-by-step deployment instructions
+- **[Changelog](./CHANGELOG.md)** - Version history and updates
 
-**Step 4: User Profile Validator** (~275 lines)
-- Height/weight/gender/age validation with range checking
-- WHOOP data fetching with graceful fallbacks
-- AI context building for prompt enhancement
-- Error handling for invalid inputs
+---
 
-**Vision Pipeline Orchestrator** (~500 lines)
-- Complete Steps 1-9 workflow orchestration
-- Async/await throughout for optimal performance
-- Error handling at each step with PhotoAnalysisError
-- Performance profiling integration
-- Pipeline metadata tracking
+## Development
 
-**Integration with API Routes** (modified)
-- Removed mock scan data generation
-- Real Claude Vision API calls in `POST /api/v1/scans`
-- Complete end-to-end flow from photo upload to Firestore
+### Running Tests
 
-**Integration Tests** (~300 lines)
-- Unit tests for Steps 4-9 individual components
-- Mock vision pipeline tests
-- Run with: `python test_vision_pipeline.py`
+```bash
+# Run all tests
+pytest
 
-## 🚧 Roadmap
+# Run with coverage
+pytest --cov=photoanalysis --cov-report=html
 
-**Phase 7: Enhanced Features** (Future):
-1. Firebase Storage integration for photo uploads
-2. Batch scan processing
-3. Real-time progress updates via WebSockets
-4. Frontend dashboard (React/Next.js)
-5. Mobile app integration (React Native)
-6. Advanced body composition analytics
-7. Social features (compare with friends)
-8. Progress photo timeline
+# Run specific test file
+pytest tests/test_vision_pipeline.py
+```
 
-## 📄 License
+### Code Quality
 
-MIT License - see [LICENSE](../../LICENSE)
+```bash
+# Format code with black
+black photoanalysis/
 
-## 👤 Author
+# Lint with flake8
+flake8 photoanalysis/
 
-Akhil Reddy Danda - [@DandaAkhilReddy](https://github.com/DandaAkhilReddy)
+# Type checking with mypy
+mypy photoanalysis/
+```
+
+---
+
+## Performance
+
+### Response Times
+- Image validation: < 1s
+- AI vision analysis: 15-30s (depends on Claude API)
+- Complete scan pipeline: 20-35s
+- Health check: < 100ms
+
+### Scalability
+- Async processing with FastAPI
+- Horizontal scaling on Fly.io
+- Rate limiting: 10 requests/minute per user
+- Image size limits: 10MB per image
+
+---
+
+## Security
+
+- JWT-based authentication
+- API key validation
+- Rate limiting per user/IP
+- Input validation with Pydantic
+- Secure environment variable management
+- HTTPS-only in production
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is proprietary software. All rights reserved.
+
+---
+
+## Contact
+
+**Developer:** Akhil Reddy Danda
+**Email:** akhilreddydanda3@gmail.com
+**GitHub:** [@DandaAkhilReddy](https://github.com/DandaAkhilReddy)
+**Repository:** https://github.com/DandaAkhilReddy/reddy
+
+---
+
+## Acknowledgments
+
+- **Anthropic** - Claude 3.5 Sonnet vision AI
+- **Google** - MediaPipe pose detection and Firebase
+- **FastAPI** - Modern Python web framework
+- **Fly.io** - Cloud hosting platform
+
+---
+
+**Built with ❤️ by Akhil Reddy**

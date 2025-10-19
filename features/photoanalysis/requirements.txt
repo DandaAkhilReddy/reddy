@@ -4,7 +4,10 @@ uvicorn[standard]==0.27.0
 python-multipart==0.0.6
 
 # Image Processing
+# Note: For Docker/production, opencv-python-headless is lighter (no GUI dependencies)
+# Use opencv-python for local development, opencv-python-headless for Docker
 opencv-python==4.9.0.80
+# opencv-python-headless==4.9.0.80  # Uncomment for Docker builds
 Pillow==10.2.0
 mediapipe==0.10.9
 
